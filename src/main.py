@@ -7,7 +7,7 @@ import tensorflow as tf
 if __name__ == '__main__':
     num_epochs = 1000
     n_classes = 20
-    batch_size = 5
+    batch_size = 20
     num_features = 19
     timesteps = 150
     rnn_size = 256

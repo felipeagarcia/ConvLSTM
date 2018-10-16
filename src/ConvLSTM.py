@@ -4,11 +4,12 @@ import numpy as np
 
 class ConvLSTM():
     def __init__(self, num_classes, num_lstm_cells=128, num_lstm_layers=1,
-                 cnn_filters=(1, 1), pool_size=(2, 2), num_cnn_cells=128,
+                 cnn_filters=(3), pool_size=3, num_cnn_cells=128,
                  num_cnn_layers=2, dropout_rate=0.2):
+        self.num_classes = num_classes
         self.num_lstm_cells = num_lstm_cells
         self.num_lstm_layers = num_cnn_layers
-        self.cnn_filters = np.float64(cnn_filters)
+        self.cnn_filters = cnn_filters
         self.pool_size = pool_size
         self.num_cnn_layers = num_cnn_layers
         self.num_cnn_cells = num_cnn_cells
@@ -18,13 +19,13 @@ class ConvLSTM():
 
     def create_cnn_model(self, input_shape):
         model = tf.keras.models.Sequential()
-        model.add(tf.keras.layers.Conv2D(64, self.cnn_filters, input_shape=input_shape))
+        model.add(tf.keras.layers.Conv1D(64, self.cnn_filters, input_shape=input_shape))
         model.add(tf.keras.layers.Activation('relu'))
-        model.add(tf.keras.layers.MaxPooling2D(self.pool_size))
+        model.add(tf.keras.layers.MaxPooling1D(self.pool_size))
         for layer in range(1, self.num_cnn_layers):
-            model.add(tf.keras.layers.Conv2D(128, self.cnn_filters, activation='relu'))
+            model.add(tf.keras.layers.Conv1D(128, self.cnn_filters, activation='relu'))
             model.add(tf.keras.layers.Activation('relu'))
-            model.add(tf.keras.layers.MaxPooling2D(self.pool_size))
+            model.add(tf.keras.layers.MaxPooling1D(self.pool_size))
         model.add(tf.keras.layers.Flatten())
         return model
 
@@ -40,7 +41,7 @@ class ConvLSTM():
 
     def create_network(self, input_data, time_steps, num_features):
         # input_data = np.array(input_data)
-        cnn_input = tf.reshape(input_data, (-1, time_steps, num_features, 1))
+        cnn_input = tf.reshape(input_data, (-1, time_steps, num_features))
         lstm_input = tf.reshape(input_data, (-1, time_steps, num_features))
         shape_cnn = cnn_input.shape[1:]
         shape_lstm = lstm_input.shape[1:]
@@ -61,9 +62,9 @@ class ConvLSTM():
 
     def fit(self, input_data, labels, num_epochs, time_steps, num_features,
             batch_size, learn_rate=0.01):
-        cnn_input = tf.reshape(input_data, (-1, time_steps, num_features, 1))
+        cnn_input = tf.reshape(input_data, (-1, time_steps, num_features))
         lstm_input = tf.reshape(input_data, (-1, time_steps, num_features))
-        labels = tf.reshape(labels, (-1, 20))
+        labels = tf.reshape(labels, (-1, self.num_classes))
         print(labels.shape)
         self.model.fit({'lstm_input': lstm_input, 'cnn_input': cnn_input},
                        {'network_output': labels},
