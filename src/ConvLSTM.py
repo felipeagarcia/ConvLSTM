@@ -4,35 +4,36 @@ import numpy as np
 
 class ConvLSTM():
     def __init__(self, num_classes, num_lstm_cells=128, num_lstm_layers=1,
-                 cnn_filters=(1), pool_size=(2), num_cnn_cells=128,
-                 num_cnn_layers=2, dropout_rate=0.4):
+                 kernel_size=(1), filter_size=128, pool_size=(2),
+                 num_cnn_layers=3, dropout_rate=0.4):
         self.num_classes = num_classes
         self.num_lstm_cells = num_lstm_cells
         self.num_lstm_layers = num_cnn_layers
-        self.cnn_filters = cnn_filters
         self.pool_size = pool_size
         self.num_cnn_layers = num_cnn_layers
-        self.num_cnn_cells = num_cnn_cells
         self.num_classes = num_classes
         self.dropout_rate = dropout_rate
+        self.kernel_size = kernel_size
+        self.filter_size = filter_size
         self.model = None
 
     def create_cnn_model(self, input_shape):
         model = tf.keras.models.Sequential()
-        model.add(tf.keras.layers.Conv1D(64, self.cnn_filters, input_shape=input_shape))
+        model.add(tf.keras.layers.Conv1D(self.filter_size, self.cnn_filters, input_shape=input_shape))
+        model.add(tf.keras.layers.BatchNormalization())
         model.add(tf.keras.layers.Activation('relu'))
-        model.add(tf.keras.layers.MaxPooling1D(self.pool_size))
         for layer in range(1, self.num_cnn_layers):
-            model.add(tf.keras.layers.Conv1D(128, self.cnn_filters, activation='relu'))
+            model.add(tf.keras.layers.Conv1D(256, self.cnn_filters, activation='relu'))
+            model.add(tf.keras.layers.BatchNormalization())
             model.add(tf.keras.layers.Activation('relu'))
-            model.add(tf.keras.layers.MaxPooling1D(self.pool_size))
-        model.add(tf.keras.layers.Flatten())
+        model.add(tf.keras.layers.AveragePooling1D(self.pool_size))
         return model
 
     def create_lstm_model(self, input_shape):
         model = tf.keras.models.Sequential()
+        model.add(tf.keras.layers.Reshape((0, 2, 1)))
         model.add(tf.keras.layers.CuDNNLSTM(self.num_lstm_cells,
-                  input_shape=input_shape, return_sequences=True))
+                  input_shape=model.output_shape, return_sequences=True))
         model.add(tf.keras.layers.Dropout(self.dropout_rate))
         for layer in range(1, self.num_lstm_layers):
             model.add(tf.keras.layers.CuDNNLSTM(self.num_lstm_cells))
