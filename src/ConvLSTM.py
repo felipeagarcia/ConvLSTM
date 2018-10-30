@@ -4,8 +4,8 @@ import numpy as np
 
 class ConvLSTM():
     def __init__(self, num_classes, num_lstm_cells=128, num_lstm_layers=1,
-                 kernel_size=(2), filter_size=[128, 128, 128], pool_size=(2),
-                 num_cnn_layers=3, dropout_rate=0.6):
+                 kernel_size=(10), filter_size=[128, 256, 128], pool_size=(2),
+                 num_cnn_layers=3, dropout_rate=0.8):
         self.num_classes = num_classes
         self.num_lstm_cells = num_lstm_cells
         self.num_lstm_layers = num_cnn_layers
@@ -62,18 +62,18 @@ class ConvLSTM():
                       metrics=['accuracy'])
         self.model = model
 
-    def fit(self, input_data, labels, test_data, test_labels, num_epochs, time_steps, num_features,
+    def fit(self, input_data, labels, num_epochs, time_steps, num_features,
             batch_size, learn_rate=0.01):
-        cnn_input = tf.reshape(input_data, (-1, time_steps, num_features))
-        lstm_input = tf.reshape(input_data, (-1, time_steps, num_features))
-        test_data = tf.reshape(test_data, (-1, time_steps, num_features))
-        self.model.fit({'lstm_input': lstm_input, 'cnn_input': cnn_input},
-                       {'network_output': labels}, validation_data=([test_data, test_data], test_labels),
-                       epochs=num_epochs, steps_per_epoch=batch_size, validation_steps=2, shuffle=True)
+            cnn_input = np.reshape(input_data, (-1, time_steps, num_features))
+            lstm_input = np.reshape(input_data, (-1, time_steps, num_features))
+            self.model.fit({'lstm_input': lstm_input, 'cnn_input': cnn_input},
+                       {'network_output': labels},
+                       epochs=num_epochs, batch_size=batch_size,
+                       validation_split=0.2)
 
     def evaluate(self, test_data, test_labels, time_steps, num_features):
-        cnn_data = tf.reshape(test_data, (-1, time_steps, num_features))
-        lstm_data = tf.reshape(test_data, (-1, time_steps, num_features))
+        cnn_data = np.reshape(test_data, (-1, time_steps, num_features))
+        lstm_data = np.reshape(test_data, (-1, time_steps, num_features))
         loss, accuracy = self.model.evaluate(x=[lstm_data, cnn_data], y=test_labels, steps=2)
         print("Model loss:", loss, ", Accuracy:", accuracy)
         return loss, accuracy
