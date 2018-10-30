@@ -2,7 +2,7 @@
 Implementation of a ConvLSTM architecture in TensorFlow Keras.
 
 ## Description
-This code implements a network proposed by Karim et. al. [1], wich consists on three convolutional layers and a LSTM layer receiving
+This code implements a network proposed by Karim et. al. [1], wich consists on three convolutional layers and a LSTM layer 
 processing the input data parallel, then, the outputs of each layer are concatenated and used by a softmax layer.
 
 [1] Karim, Fazle, et al. "LSTM fully convolutional networks for time series classification." IEEE Access 6 (2018): 1662-1669.
