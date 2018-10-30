@@ -9,4 +9,5 @@ processing the input data parallel, then, the outputs of each layer are concaten
 
 ## Files
 data/ contains the dataset data, having 20 classes with 10 examples by class
+
 src/ contains the source code
