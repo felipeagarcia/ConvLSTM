@@ -7,7 +7,7 @@ import os
 
 if __name__ == '__main__':
     num_epochs = 1000
-    n_classes = 7
+    n_classes = 12
     batch_size = 131
     num_features = 9
     timesteps = 512
@@ -18,6 +18,8 @@ if __name__ == '__main__':
     network_output = tf.placeholder('float', [None, n_classes])
     inputs, labels, test_inputs, test_labels = data.load_pampap2()
     print(inputs.shape)
+    print(labels.shape)
     model = ConvLSTM(n_classes, num_lstm_cells=rnn_size)
     model.create_network(network_input, timesteps, num_features)
     model.fit(inputs, labels, num_epochs, timesteps, num_features, batch_size)
+    model.evaluate(test_inputs, test_labels, timesteps, num_features)
