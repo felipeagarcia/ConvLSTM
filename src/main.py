@@ -7,16 +7,16 @@ import os
 
 if __name__ == '__main__':
     num_epochs = 1000
-    n_classes = 12
-    batch_size = 131
-    num_features = 9
-    timesteps = 512
+    n_classes = 18
+    batch_size = 85
+    num_features = 113
+    timesteps = 24
     rnn_size = 258
     max_len = 150
     os.environ['CUDA_VISIBLE_DEVICES'] = str(1)
     network_input = tf.placeholder(tf.float32, [None, timesteps, num_features])
     network_output = tf.placeholder('float', [None, n_classes])
-    inputs, labels, test_inputs, test_labels = data.load_pampap2()
+    inputs, labels, test_inputs, test_labels = data.load_data()
     print(inputs.shape)
     print(labels.shape)
     model = ConvLSTM(n_classes, num_lstm_cells=rnn_size)

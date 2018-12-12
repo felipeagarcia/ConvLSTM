@@ -4,8 +4,8 @@ import numpy as np
 
 class ConvLSTM():
     def __init__(self, num_classes, num_lstm_cells=128, num_lstm_layers=1,
-                 kernel_size=(10), filter_size=[128, 256, 128], pool_size=(2),
-                 num_cnn_layers=3, dropout_rate=0.8):
+                 kernel_size=(4), filter_size=[128, 256, 128], pool_size=(2),
+                 num_cnn_layers=3, dropout_rate=0.1):
         self.num_classes = num_classes
         self.num_lstm_cells = num_lstm_cells
         self.num_lstm_layers = num_cnn_layers
@@ -32,9 +32,9 @@ class ConvLSTM():
 
     def create_lstm_model(self, input_shape):
         model = tf.keras.models.Sequential()
-        model.add(tf.keras.layers.Permute((2,1), input_shape=input_shape))
+       # model.add(tf.keras.layers.Permute((2,1), input_shape=input_shape))
         model.add(tf.keras.layers.CuDNNLSTM(self.num_lstm_cells,
-                  return_sequences=True))
+                  return_sequences=True, input_shape=input_shape))
         model.add(tf.keras.layers.Dropout(self.dropout_rate))
         for layer in range(1, self.num_lstm_layers):
             model.add(tf.keras.layers.CuDNNLSTM(self.num_lstm_cells, return_sequences=True))
